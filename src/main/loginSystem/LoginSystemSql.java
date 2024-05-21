@@ -12,6 +12,7 @@ public class LoginSystemSql {
             return false;
         }else{
             userstore.insert(new Account(username,passowrd));
+            userstore.creatSqlTabel(username);
             System.out.println("registred secssufully");
             return true;
         }

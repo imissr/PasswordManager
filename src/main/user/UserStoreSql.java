@@ -23,8 +23,12 @@ public class UserStoreSql {
 
     public void insert(Account account) {
         String insertSQL = "INSERT INTO Account(password,username) VALUES(?,?)";
-        try (Connection connect = this.connect();
+        String sql = "CREATE TABLE IF NOT EXISTS " + account.getUsername() +" (" +
+                "password text NOT NULL," +
+                "user text NOT NULL PRIMARY KEY" +
+                ");";
 
+        try (Connection connect = this.connect();
              PreparedStatement pstmt = connect.prepareStatement(insertSQL)) {
             pstmt.setString(1, account.getPassword());
             pstmt.setString(2, account.getUsername());
@@ -73,4 +77,28 @@ public class UserStoreSql {
         }
         return null;
     }
+
+    public boolean creatSqlTabel(String table)  {
+        String sql = "CREATE TABLE IF NOT EXISTS " + table +" (" +
+                    "id INTEGER NOT NULL PRIMARY KEY UNIQUE,"+
+                    "title text NOT NULL," +
+                    "username text NOT NULL," +
+                    "password text NOT NULL"+
+                    ");";
+
+        try (Connection connect = this.connect();
+        var stmt = connect.createStatement()){
+            stmt.execute(sql);
+            return true;
+        }catch(SQLException e){
+            System.out.println("faild to creat a sqltabel");
+            return false;
+        }
+    }
+
+
+
+
+
+
 }

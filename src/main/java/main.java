@@ -2,8 +2,8 @@ import java.util.Scanner;
 
 public class main {
     public static void main(String[] args) {
-
         UserStoreSql userstor = new UserStoreSql();
+
         // UserStore userStore = new UserStore();
         //LoginSystem loginSystem = new LoginSystem(userstor);
         LoginSystemSql loginSystem = new LoginSystemSql(userstor);
