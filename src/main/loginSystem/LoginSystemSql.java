@@ -7,7 +7,7 @@ public class LoginSystemSql {
     }
 
     public boolean register(String passowrd,String username){
-        if(userstore.checkIfUsernameExists(username)){
+        if(userstore.checkForDuplicateUsername(username)){
             System.out.println("the username exists, please try another username");
             return false;
         }else{
@@ -20,12 +20,11 @@ public class LoginSystemSql {
 
     public boolean login(String password,String username){
 
-        if(!userstore.checkIfUsernameExists(username)) {
+        if(!userstore.checkForDuplicateUsername(username)) {
             System.out.println("login faild");
             return false;
         }else{
-
-            if(userstore.getPasswordForUsername(username).equals(password )){
+            if(userstore.getPasswordForUsername(username).equals(password)){
                 System.out.println("Login successful!");
                 return true;
             }

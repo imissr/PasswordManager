@@ -1,4 +1,8 @@
 import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UserStoreSql {
     String url = "jdbc:sqlite:E:\\database\\test.db\\";
@@ -39,17 +43,44 @@ public class UserStoreSql {
         }
     }
 
+    /*public boolean  checkIfUsernameExists1(String username){
+        String query = "SELECT username FROM Account WHERE username = ?";
+        try (Connection connect = this.connect();
+             PreparedStatement pstmt = connect.prepareStatement(query)) {
+            pstmt.setString(1, username);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    String check = rs.getString("username");
+                    System.out.println(check);
+                   if(check.equals("null"))
+                    return false;
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+        }
+        return true;
+    }*/
+
+
+
     public boolean checkIfUsernameExists(String username) {
-        String query = "SELECT COUNT(*) AS count FROM Account WHERE username = ?";
+        String query = "SELECT FROM Account WHERE username = ?";
         try (Connection connect = this.connect();
              PreparedStatement pstmt = connect.prepareStatement(query)) {
             pstmt.setString(1, username);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     int count = rs.getInt("count");
-                    return count > 0;
+                    if(count == username.length() && count > 0 ){
+                        return true;
+                    }
+
                 }
             }
+
 
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
@@ -57,6 +88,38 @@ public class UserStoreSql {
         return false;
 
     }
+    private String normalizeUsername(String username) {
+        username = username.toLowerCase();
+        username = username.trim();
+        Pattern pattern = Pattern.compile("\\s+");
+        Matcher matcher = pattern.matcher(username);
+        return matcher.replaceAll(" ");
+    }
+
+    public boolean checkForDuplicateUsername(String inputUsername) {
+        String normalizedInputUsername = normalizeUsername(inputUsername);
+
+        try (Connection conn = this.connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT username FROM Account")) {
+
+            while (rs.next()) {
+                String username = rs.getString("username");
+                String normalizedUsername = normalizeUsername(username);
+
+                if (normalizedInputUsername.equals(normalizedUsername)) {
+                    return true;  // Found a duplicate
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;  // No duplicates found
+    }
+
+
+
 
     public String getPasswordForUsername(String username) {
         String query = "SELECT password FROM Account WHERE username = ?";

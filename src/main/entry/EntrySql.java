@@ -55,6 +55,10 @@ public class EntrySql {
         }
     }
 
+    public void deleteAccount(String username){
+
+    }
+
     public void updateId(String username) throws SQLException {
         String fetchID = "SELECT id FROM " + username + " ORDER BY id";
         try (Connection connect = this.connect();
