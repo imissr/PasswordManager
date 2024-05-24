@@ -29,7 +29,6 @@ public class LoginSystemSql {
                 System.out.println("Login successful!");
                 return true;
             }
-            System.out.println("lol");
             return false;
 
         }

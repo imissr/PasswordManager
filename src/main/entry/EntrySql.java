@@ -1,11 +1,9 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class EntrySql {
 
     String url = "jdbc:sqlite:E:\\database\\test.db\\";
+    int id = 1;
 
     EntrySql(){
 
@@ -25,8 +23,8 @@ public class EntrySql {
 
 
 
-    public void insert(String username,String password,String email, int id,String title) {
-        String insertSQL = "INSERT INTO " +  username + "(id,title,username,passowrd) VALUES(?,?,?,?)";
+    public void insert(String username,String password,String email ,String title) throws SQLException {
+        String insertSQL = "INSERT INTO " +  username + "(id,title,username,password) VALUES(?,?,?,?)";
 
         try (Connection connect = this.connect();
              PreparedStatement pstmt = connect.prepareStatement(insertSQL)) {
@@ -36,8 +34,39 @@ public class EntrySql {
             pstmt.setString(4, password);
             pstmt.executeUpdate();
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        }
+        id++;
+    }
+
+    public void delete(String username, int id) throws SQLException{
+        String deleteQUERY = "DELETE FROM " + username + " WHERE id = ?";
+        try( Connection connect = this.connect();
+            PreparedStatement pstmt = connect.prepareStatement(deleteQUERY)){
+                pstmt.setInt(1,id);
+                int rowsAffected = pstmt.executeUpdate();
+                if(rowsAffected  > 0 ){
+                    System.out.println("entry deleted seccessfully");
+
+
+            }else{
+                    System.out.println("No entry found with the specified ID.");
+
+                }
+
+        }
+    }
+
+    public void updateId(String username,int id) throws SQLException{
+        String fetchID = "SELECT id FROM " + username + " ORDER BY id";
+        try(Connection connect = this.connect();
+             PreparedStatement fetch = connect.prepareStatement(fetchID);
+            ResultSet rs = fetch.executeQuery()){
+            int newID = 1;
+            while(rs.next()){
+                int currentID = rs.getInt("id");
+
+            }
+
         }
     }
 

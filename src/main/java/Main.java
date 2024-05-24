@@ -7,11 +7,11 @@ public class Main {
 
 
     UserStoreSql userstor = new UserStoreSql();
+    EntrySql entrySql = new EntrySql();
+    PasswordManager passwordManager = new PasswordManager(entrySql);
 
-    // UserStore userStore = new UserStore();
-    //LoginSystem loginSystem = new LoginSystem(userstor);
     LoginSystemSql loginSystem = new LoginSystemSql(userstor);
-    EntryStore entryStore = new EntryStore();
+
 
     public void loginPormpt(){
         Scanner scanner = new Scanner(System.in);
@@ -31,6 +31,7 @@ public class Main {
                     System.out.print("Enter password: ");
                     String loginPassword = scanner.nextLine();
                     loginSystem.login(loginPassword, loginUsername);
+                    passwordPrompt(loginUsername);
                     break;
                 case 2:
                     System.out.print("Enter new username: ");
@@ -50,7 +51,7 @@ public class Main {
 
     }
 
-    public void passwordPrompt(){
+    public void passwordPrompt(String username){
         Scanner scanner = new Scanner(System.in);
 
         while(true){
@@ -69,11 +70,15 @@ public class Main {
                     String email = scanner.nextLine();
                     System.out.print("Enter password: ");
                     String password = scanner.nextLine();
-
-
-
+                    passwordManager.addEntryToDataBase(username,passwordManager.creatEntry(email,title,password));
 
                     break;
+                case 2:
+                    System.out.print("Enter id: ");
+                    int id = scanner.nextInt();
+                    passwordManager.deleatEntryFromDataBase(username,id);
+                    break;
+
                 case 3:
                     System.out.println("Exiting...");
                     return;

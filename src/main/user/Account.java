@@ -1,13 +1,13 @@
 public class Account {
    private String username;
    private String password;
-   private EntryStore entry;
+   private EntrySql entry;
 
-    public EntryStore getEntry() {
+    public EntrySql getEntry() {
         return entry;
     }
 
-    public void setEntry(EntryStore entry) {
+    public void setEntry(EntrySql entry) {
         this.entry = entry;
     }
 
