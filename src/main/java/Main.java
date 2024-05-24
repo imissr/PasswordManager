@@ -30,8 +30,9 @@ public class Main {
                     String loginUsername = scanner.nextLine();
                     System.out.print("Enter password: ");
                     String loginPassword = scanner.nextLine();
-                    loginSystem.login(loginPassword, loginUsername);
-                    passwordPrompt(loginUsername);
+                    if(!loginSystem.login(loginPassword, loginUsername))
+                        break;
+                    else passwordPrompt(loginUsername);
                     break;
                 case 2:
                     System.out.print("Enter new username: ");
@@ -57,10 +58,15 @@ public class Main {
         while(true){
             System.out.println("1. add A entry");
             System.out.println("2. deleat Entry");
-            System.out.println("3. Exit");
+            System.out.println("3. see sepcfic entry");
+            System.out.println("4. show all entry again");
+            System.out.println("5. sign out");
+            passwordManager.returnAllEntrypassword(username);
             System.out.print("Choose an option: ");
+
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline
+
 
             switch (choice) {
                 case 1:
@@ -71,15 +77,22 @@ public class Main {
                     System.out.print("Enter password: ");
                     String password = scanner.nextLine();
                     passwordManager.addEntryToDataBase(username,passwordManager.creatEntry(email,title,password));
-
                     break;
+
                 case 2:
                     System.out.print("Enter id: ");
                     int id = scanner.nextInt();
                     passwordManager.deleatEntryFromDataBase(username,id);
                     break;
-
                 case 3:
+                    System.out.print("Enter id: ");
+                    int id1 = scanner.nextInt();
+                    passwordManager.returnspecficEntry(username,id1);
+                    break;
+                case 4:
+                    passwordManager.returnAllEntrypassword(username);
+                    break;
+                case 5:
                     System.out.println("Exiting...");
                     return;
                 default:
