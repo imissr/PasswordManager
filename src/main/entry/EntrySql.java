@@ -2,8 +2,8 @@ import java.sql.*;
 
 public class EntrySql {
 
-    String url = "jdbc:sqlite:E:\\database\\test.db\\";
-    int id = 1;
+    private String url = "jdbc:sqlite:E:\\database\\test.db\\";
+    private int id = 1;
 
     EntrySql(){
 
@@ -56,7 +56,7 @@ public class EntrySql {
         }
     }
 
-    public void updateId(String username,int id) throws SQLException{
+    public void updateId(String username) throws SQLException{
         String fetchID = "SELECT id FROM " + username + " ORDER BY id";
         try(Connection connect = this.connect();
              PreparedStatement fetch = connect.prepareStatement(fetchID);
@@ -65,9 +65,39 @@ public class EntrySql {
             while(rs.next()){
                 int currentID = rs.getInt("id");
 
+
+                String updateSqlID= "UPDATE " + username + " SET id = ? WHERE id = ?";
+                try(PreparedStatement update = connect.prepareStatement(updateSqlID)){
+                    update.setInt(1,newID);
+                    update.setInt(2,currentID);
+                    update.executeUpdate();
+                }
+                newID++ ;
+
             }
 
+            if(checkIfTableIsClear(username)) id = 1;
+            else id = newID;
+
+            System.out.println(" id updated seccessfully");
+
         }
+    }
+
+    public boolean checkIfTableIsClear(String username) throws SQLException {
+        String query = "SELECT COUNT(*) AS rowcount FROM " + username;
+
+        try (Connection connect = this.connect();
+             PreparedStatement pstmt = connect.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                int count = rs.getInt("rowcount");
+                return count == 0;
+            }
+        }
+
+
+        return false;
     }
 
 

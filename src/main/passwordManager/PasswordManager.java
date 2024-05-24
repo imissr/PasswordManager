@@ -30,6 +30,7 @@ public class PasswordManager {
     public boolean deleatEntryFromDataBase(String username,int id){
         try {
             entrysql.delete(username,id);
+            entrysql.updateId(username);
             return true;
         } catch (SQLException e) {
             return false;
