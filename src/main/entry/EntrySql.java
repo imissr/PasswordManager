@@ -55,9 +55,6 @@ public class EntrySql {
         }
     }
 
-    public void deleteAccount(String username){
-
-    }
 
     public void updateId(String username) throws SQLException {
         String fetchID = "SELECT id FROM " + username + " ORDER BY id";
@@ -135,6 +132,39 @@ public class EntrySql {
                     System.out.println("No entry found with the specified ID.");
                 }
             }
+        }
+    }
+
+    public void deletAccount(String username) throws SQLException{
+        String query = "DELETE FROM Account WHERE username = ?";
+        try(Connection conn = this.connect();
+            PreparedStatement pstmt = conn.prepareStatement(query)){
+            pstmt.setString(1,username);
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("entry deleted seccessfully");
+                deleteTable(username);
+            } else {
+                System.out.println("No entry found with the specified ID.");
+
+            }
+        }
+    }
+
+    public void deleteTable(String tableName) throws SQLException {
+        // Ensure the table name is safe to use in SQL queries
+        if (tableName == null || !tableName.matches("[a-zA-Z0-9_]+")) {
+            throw new IllegalArgumentException("Invalid table name: " + tableName);
+        }
+
+        String query = "DROP TABLE " + tableName;
+        try (Connection conn = this.connect();
+             Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(query);
+            System.out.println("Table " + tableName + " deleted successfully");
+        } catch (SQLException e) {
+            System.out.println("An error occurred: " + e.getMessage());
+            // Handle the exception properly, potentially rethrowing or logging it
         }
     }
 

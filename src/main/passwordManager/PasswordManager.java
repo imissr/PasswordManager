@@ -56,12 +56,22 @@ public class PasswordManager {
         return false;
     }
 
+    public boolean deleteAccount(String username){
+        try{
+            entrysql.deletAccount(username);
+        }catch(SQLException e){
+            System.out.println("faild to delete Account");
+            return false;
+        }
+        return true;
+    }
+
 
 
 
     // Todo need to hash password thats saved in the database and save the hash instead of the password
-    // TODO PASSWORD NEED TO BE BLURED BY POINTS
-    // TODO DELETE A ACCOUNT
+
+
 
 
 
