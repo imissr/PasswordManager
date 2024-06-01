@@ -11,8 +11,9 @@ public class Main {
     UserStoreSql userstor = new UserStoreSql();
     EntrySql entrySql = new EntrySql();
     PasswordManager passwordManager = new PasswordManager(entrySql);
+    Password instance = Password.getInstance();
 
-    LoginSystemSql loginSystem = new LoginSystemSql(userstor);
+    LoginSystemSql loginSystem = new LoginSystemSql(userstor,instance);
 
 
     public void loginPormpt(){
@@ -43,8 +44,13 @@ public class Main {
                         String registerUsername = scanner.nextLine();
                         System.out.print("Enter new password: ");
                         String registerPassword = scanner.nextLine();
-                        loginSystem.register(registerPassword, registerUsername);
-                        break;
+                        if(registerUsername != "" || registerPassword != ""){
+                            loginSystem.register(registerPassword, registerUsername);
+                            break;
+                        }else{
+                            System.out.println("invalid username or password");
+                            break;
+                        }
                     case 3:
                         System.out.println("Exiting...");
                         return;
