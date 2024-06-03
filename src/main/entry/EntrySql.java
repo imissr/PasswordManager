@@ -1,3 +1,5 @@
+import java.io.Closeable;
+import java.io.IOException;
 import java.sql.*;
 
 public class EntrySql {
@@ -5,28 +7,35 @@ public class EntrySql {
     private String url = "jdbc:sqlite:E:\\database\\test.db\\";
     private int id = 1;
 
-    EntrySql() {
+     public Connection connection = null;
 
+    EntrySql() {
+        this.connect();
     }
 
-    public Connection connect() {
-        Connection connection = null;
+
+
+    public final void connect() {
+         connection = null;
         try {
             connection = DriverManager.getConnection(url);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            this.close();
         }
 
-        return connection;
 
     }
+    //connect function with throws beccause of GUI
+    //connect function return with void
+    // identify from where sql expction from is problimatic
+    // connect should not be inside try -> try calls ->close interface
+
 
 
     public void insert(String username, String password, String email, String title) throws SQLException {
         String insertSQL = "INSERT INTO " + username + "(id,title,username,password) VALUES(?,?,?,?)";
-
-        try (Connection connect = this.connect();
-             PreparedStatement pstmt = connect.prepareStatement(insertSQL)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
             pstmt.setInt(1, id);
             pstmt.setString(2, title);
             pstmt.setString(3, email);
@@ -39,8 +48,8 @@ public class EntrySql {
 
     public void delete(String username, int id) throws SQLException {
         String deleteQUERY = "DELETE FROM " + username + " WHERE id = ?";
-        try (Connection connect = this.connect();
-             PreparedStatement pstmt = connect.prepareStatement(deleteQUERY)) {
+
+        try (PreparedStatement pstmt = connection.prepareStatement(deleteQUERY)) {
             pstmt.setInt(1, id);
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -58,8 +67,8 @@ public class EntrySql {
 
     public void updateId(String username) throws SQLException {
         String fetchID = "SELECT id FROM " + username + " ORDER BY id";
-        try (Connection connect = this.connect();
-             PreparedStatement fetch = connect.prepareStatement(fetchID);
+
+        try (PreparedStatement fetch = connection.prepareStatement(fetchID);
              ResultSet rs = fetch.executeQuery()) {
             int newID = 1;
             while (rs.next()) {
@@ -67,7 +76,7 @@ public class EntrySql {
 
 
                 String updateSqlID = "UPDATE " + username + " SET id = ? WHERE id = ?";
-                try (PreparedStatement update = connect.prepareStatement(updateSqlID)) {
+                try (PreparedStatement update = connection.prepareStatement(updateSqlID)) {
                     update.setInt(1, newID);
                     update.setInt(2, currentID);
                     update.executeUpdate();
@@ -87,8 +96,7 @@ public class EntrySql {
     public boolean checkIfTableIsClear(String username) throws SQLException {
         String query = "SELECT COUNT(*) AS rowcount FROM " + username;
 
-        try (Connection connect = this.connect();
-             PreparedStatement pstmt = connect.prepareStatement(query);
+        try (PreparedStatement pstmt = connection.prepareStatement(query);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 int count = rs.getInt("rowcount");
@@ -103,8 +111,8 @@ public class EntrySql {
 
     public void returnAllEntry(String username) throws SQLException {
         String query = "SELECT id,title FROM " + username;
-        try (Connection connect = this.connect();
-             PreparedStatement pstmt = connect.prepareStatement(query);
+
+        try (PreparedStatement pstmt = connection.prepareStatement(query);
              ResultSet rst = pstmt.executeQuery()) {
             System.out.printf("%-10s %-30s%n", "ID", "Title");
             while (rst.next()) {
@@ -120,8 +128,8 @@ public class EntrySql {
 
     public void returnPasswordAndUsername(String username,int id) throws SQLException {
         String query = "SELECT username,password FROM " + username + " WHERE id = ?";
-        try (Connection conn = this.connect();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)){
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -137,8 +145,8 @@ public class EntrySql {
 
     public void deletAccount(String username) throws SQLException{
         String query = "DELETE FROM Account WHERE username = ?";
-        try(Connection conn = this.connect();
-            PreparedStatement pstmt = conn.prepareStatement(query)){
+
+        try (PreparedStatement pstmt = connection.prepareStatement(query)){
             pstmt.setString(1,username);
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -158,8 +166,8 @@ public class EntrySql {
         }
 
         String query = "DROP TABLE " + tableName;
-        try (Connection conn = this.connect();
-             Statement stmt = conn.createStatement()) {
+        try (
+             Statement stmt = connection.createStatement()) {
             stmt.executeUpdate(query);
             System.out.println("Table " + tableName + " deleted successfully");
         } catch (SQLException e) {
@@ -170,4 +178,14 @@ public class EntrySql {
 
 
 
+    public void close()  {
+        if(connection == null)
+            return;
+        try {
+            connection.close();
+            connection = null;
+        }catch (SQLException e ){
+            System.err.println(e.getMessage());
+        }
+    }
 }

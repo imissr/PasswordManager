@@ -19,7 +19,6 @@ public class Password {
     // Method to check a password against a hashed password
     public boolean checkPassword(String plainPassword, String hashedPassword) {
         return BCrypt.checkpw(plainPassword, hashedPassword);
-
     }
 
 

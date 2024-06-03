@@ -69,10 +69,6 @@ public class PasswordManager {
 
 
 
-    // Todo need to hash password thats saved in the database and save the hash instead of the password
-
-
-
 
 
 

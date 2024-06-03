@@ -6,3 +6,5 @@ public class runner {
         main.loginPormpt();
     }
 }
+//Todo add interfaces for the important classes
+//Todo make important classes private

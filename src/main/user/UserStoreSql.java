@@ -7,33 +7,32 @@ import java.util.regex.Pattern;
 public class UserStoreSql {
     String url = "jdbc:sqlite:E:\\database\\test.db\\";
 
-    UserStoreSql() {
+    private Connection connection = null;
 
+    UserStoreSql() {
+        this.connect();
     }
 
 
-    public Connection connect() {
-        Connection connection = null;
+    public final void connect() {
+        connection = null;
         try {
             connection = DriverManager.getConnection(url);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            this.close();
         }
 
-        return connection;
 
     }
 
 
     public void insert(Account account) {
         String insertSQL = "INSERT INTO Account(password,username) VALUES(?,?)";
-        String sql = "CREATE TABLE IF NOT EXISTS " + account.getUsername() +" (" +
-                "password text NOT NULL," +
-                "user text NOT NULL PRIMARY KEY" +
-                ");";
 
-        try (Connection connect = this.connect();
-             PreparedStatement pstmt = connect.prepareStatement(insertSQL)) {
+
+        try (
+             PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
             pstmt.setString(1, account.getPassword());
             pstmt.setString(2, account.getUsername());
             pstmt.executeUpdate();
@@ -68,8 +67,8 @@ public class UserStoreSql {
 
     public boolean checkIfUsernameExists(String username) {
         String query = "SELECT FROM Account WHERE username = ?";
-        try (Connection connect = this.connect();
-             PreparedStatement pstmt = connect.prepareStatement(query)) {
+        try (
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, username);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -99,8 +98,8 @@ public class UserStoreSql {
     public boolean checkForDuplicateUsername(String inputUsername) {
         String normalizedInputUsername = normalizeUsername(inputUsername);
 
-        try (Connection conn = this.connect();
-             Statement stmt = conn.createStatement();
+        try (
+             Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT username FROM Account")) {
 
             while (rs.next()) {
@@ -123,8 +122,8 @@ public class UserStoreSql {
 
     public String getPasswordForUsername(String username) {
         String query = "SELECT password FROM Account WHERE username = ?";
-        try (Connection connect = this.connect();
-             PreparedStatement pstmt = connect.prepareStatement(query)) {
+        try (
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, username);
 
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -149,8 +148,8 @@ public class UserStoreSql {
                     "password text NOT NULL"+
                     ");";
 
-        try (Connection connect = this.connect();
-        var stmt = connect.createStatement()){
+        try (
+        var stmt = connection.createStatement()){
             stmt.execute(sql);
             return true;
         }catch(SQLException e){
@@ -160,7 +159,16 @@ public class UserStoreSql {
     }
 
 
-
+    public void close()  {
+        if(connection == null)
+            return;
+        try {
+            connection.close();
+            connection = null;
+        }catch (SQLException e ){
+            System.err.println(e.getMessage());
+        }
+    }
 
 
 
